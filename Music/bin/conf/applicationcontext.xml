@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	                    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+	                     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+	                   ">
+	<context:annotation-config />
+	<context:component-scan base-package="com.zhou.framework" />
+	<aop:aspectj-autoproxy/>  
+	<!-- =============================================================== -->
+	<!-- Resources -->
+	<!-- =============================================================== -->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- =============================================================== -->
+	<!-- Data Source -->
+	<!-- =============================================================== -->
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		>
+		<property name="driverClassName" value="${jdbcDriverClassName}" />
+		<property name="url" value="${jdbcUrl}" />
+		<property name="username" value="${jdbcUsername}" />
+		<property name="password" value="${jdbcPassword}" />
+		<property name="maxActive" value="${jdbcMaxActive}" />
+		<property name="maxIdle" value="${jdbcMaxIdle}" />
+		<property name="maxWait" value="${jdbcMaxWait}" />
+		<property name="defaultAutoCommit" value="true" />
+	</bean>
+
+	<!-- =============================================================== -->
+	<!-- Hibernate -->
+	<!-- =============================================================== -->
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean" scope="singleton" >
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:hibernate.cfg.xml" />
+		<!-- <property name="hibernateProperties"> <props> <prop key="hibernate.dialect"> 
+			org.hibernate.dialect.MySQLDialect </prop> <prop key="hibernate.show_sql">true</prop> 
+			</props> </property> <property name="mappingClass"> <value>com.zhou.framework.pojo.Employee</value> -->
+		<!-- <value>com.zhou.framework.pojo.Department</value> -->
+	</bean>
+
+	<!-- 配置事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<!-- 注解方式配置事物 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+</beans>
